@@ -29,9 +29,9 @@ my_transforms = transforms.Compose([
                 transforms.Resize((32,32)),
                 #transforms.CenterCrop((32,32)),
                 #transforms.ColorJitter(1, 1),
-                #transforms.RandomRotation((90, 90)),
+                transforms.RandomRotation((90, 90)),
                 transforms.RandomVerticalFlip(),
-                #transforms.RandomHorizontalFlip(),
+                transforms.RandomHorizontalFlip(),
                 transforms.RandomCrop((32, 32), padding=2),
                 #transforms.RandomGrayscale(p = 1),
                 transforms.ToTensor(),
@@ -56,7 +56,7 @@ img_model = tensor.unsqueeze(0)
 # =============================================================================
 # Predict test image label
 # =============================================================================
-PATH, net = networks('ResNet34')
+PATH, net = networks('VGG16')
 net.load_state_dict(torch.load(PATH))
 
 output = net(img_model)

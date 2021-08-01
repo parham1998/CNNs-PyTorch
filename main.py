@@ -80,7 +80,6 @@ testset = torchvision.datasets.CIFAR10(
 # show one image
 plt.imshow(trainset.data[6]) 
 
-
 # prepare data loaders
 trainloader = torch.utils.data.DataLoader(
     trainset, 
@@ -118,7 +117,7 @@ for i in np.arange(batch_size):
 # =============================================================================
 # CNN models
 # =============================================================================
-PATH, net = networks('VGG16_pretrained')
+PATH, net = networks('VGG16')
 
 print(net)    
 
