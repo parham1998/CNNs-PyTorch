@@ -6,12 +6,14 @@ class bottleneck(nn.Module):
     
     def __init__(self, expantion, in_channels, out_channels, stride):
         super(bottleneck, self).__init__()
-        self.stride = stride
+        self.identical = True if stride == 1 and in_channels == out_channels else False
         
-        self.expantion = expantion * in_channels
+        self.inC = in_channels        
+        self.expantion = int(expantion * in_channels)
         # 1*1 pointwise exapntion
-        self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=self.expantion, kernel_size=1, stride=1, padding=0, bias=False)
-        self.bn1 = nn.BatchNorm2d(self.expantion)
+        if self.inC != self.expantion:
+            self.conv1 = nn.Conv2d(in_channels=in_channels, out_channels=self.expantion, kernel_size=1, stride=1, padding=0, bias=False)
+            self.bn1 = nn.BatchNorm2d(self.expantion)
         # 3*3 depthwise 
         self.conv2 = nn.Conv2d(in_channels=self.expantion, out_channels=self.expantion, kernel_size=3, stride=stride, padding=1, groups=self.expantion, bias=False)
         self.bn2 = nn.BatchNorm2d(self.expantion)
@@ -19,18 +21,11 @@ class bottleneck(nn.Module):
         self.conv3 = nn.Conv2d(in_channels=self.expantion, out_channels=out_channels, kernel_size=1, stride=1, padding=0, bias=False)
         self.bn3 = nn.BatchNorm2d(out_channels)
         
-        self.shortcut = nn.Sequential()
-        if stride == 1:
-            self.shortcut = nn.Sequential(
-                nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=1, stride=1, padding=0, bias=False),
-                nn.BatchNorm2d(out_channels)
-            )
-        
     def forward(self, x):
-        out = F.relu6(self.bn1(self.conv1(x)))
+        out = F.relu6(self.bn1(self.conv1(x))) if self.inC != self.expantion else x
         out = F.relu6(self.bn2(self.conv2(out)))
         out = self.bn3(self.conv3(out))
-        out = out + self.shortcut(x) if self.stride == 1 else out
+        out = out + x if self.identical else out
         return out
         
 
@@ -48,13 +43,15 @@ class MobileNetV2(nn.Module):
     def __init__(self):
         super(MobileNetV2, self).__init__()
         self.features = self._make_layers()
-        self.AvgPool = nn.AvgPool2d(kernel_size=4, stride=1)
-        self.classifier = nn.Linear(in_features=1280, out_features=10)
+        self.classifier = nn.Sequential(
+            nn.Dropout(p=0.2),
+            nn.Linear(in_features=1280, out_features=10),
+        )
         
         
     def forward(self, x):
         x = self.features(x)
-        x = self.AvgPool(x)
+        x = F.adaptive_avg_pool2d(x, (1, 1))
         x = torch.flatten(x, 1)
         x = self.classifier(x)
         return x
