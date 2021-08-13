@@ -8,7 +8,7 @@ from torch import nn
 # =============================================================================
 # loading pretrained vgg16
 # =============================================================================
-def VGG16_pretrained(freezing=False):
+def VGG16_pretrained(freezing):
 
     net = torchvision.models.vgg16(pretrained=True)   
 

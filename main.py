@@ -19,8 +19,8 @@ train_on_GPU = torch.cuda.is_available()
 if not train_on_GPU:
     print('CUDA is not available. Training on CPU ...')
 else:
-    print('CUDA is available! Training on GPU ...')
-
+    print('CUDA is available! Training on GPU ...') 
+    print(torch.cuda.get_device_properties('cuda'))
 
 # =============================================================================
 # Load data & data preprocessing
@@ -117,7 +117,7 @@ for i in np.arange(batch_size):
 # =============================================================================
 # CNN models
 # =============================================================================
-PATH, net = networks('VGG16')
+PATH, net = networks('MobileNetV2')
 
 print(net)    
 
@@ -139,8 +139,9 @@ weight_decay = 5e-4
 epochs = 200
 
 criterion = nn.CrossEntropyLoss()
-optimizer = optim.SGD(net.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
-scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+params = [p for p in net.parameters() if p.requires_grad == True]
+optimizer = optim.SGD(params, lr=lr, momentum=momentum, weight_decay=weight_decay)
+scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
 
 # =============================================================================
 # training
