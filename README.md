@@ -1,7 +1,7 @@
 # CNNs-PyTorch
 Implementation of some popular CNNs (VGG-Net, Res-Net, Mobile-Net) for image classification on CIFAR-10 dataset with PyTorch library
 
-## resources
+## references
 K. Simonyan, and A. Zisserman. </br >
 *"Very deep convolutional networks for large-scale image recognition"* (ICLR - 2015)
 
