@@ -227,6 +227,7 @@ for epoch in range(epochs):
     start = timeit.default_timer()
     train(epoch)
     test(epoch)
+    scheduler.step()
     stop = timeit.default_timer()
     print('time: {:.3f}'.format(stop - start))
 print('==> End of training ...')
